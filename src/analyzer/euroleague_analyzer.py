@@ -2,19 +2,20 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import avg, round, col
 
 
-class ElAnalyzer:
+class EuroLeagueAnalyzer:
     def __init__(self, spark, df):
         """
-        Initialize the ElAnalyzer class with a Spark session.
+        Initialize the EuroLeagueAnalyzer class with a Spark session and DataFrame.
 
         Parameters:
         - spark: SparkSession
         - df: intiial DataFrame
         """
-        self.spark = spark
-        self.df = df
+        self.__spark = spark
+        self.__df = df
+        self.__query_path = "data/queries"
 
-    def calculate_averages(self, order_col="AVG_PTS_DIFF"):
+    def calculate_team_averages(self, order_col="AVG_PTS_DIFF"):
         """
         Calculate the points scored and conceived per team
         Parameters:
@@ -27,9 +28,24 @@ class ElAnalyzer:
             round(avg(col), 1).alias(f"AVG_{col}") for col in ["PTS", "OP_PTS"]
         ]
         result_df = (
-            self.df.groupBy("team")
+            self.__df.groupBy("team")
             .agg(*avg_columns)
             .withColumn("AVG_PTS_DIFF", round(col("AVG_PTS") - col("AVG_OP_PTS"), 1))
             .orderBy(order_col, ascending=False)
         )
+        return result_df
+
+    def calculate_team_win_streaks(self):
+        """
+        Calculate longest consecutive win streaks
+
+        Returns:
+        - result_df: Spark DataFrame with columns 'team', 'WIN_STREAK'
+        """
+        self.__df.createOrReplaceTempView("euroleague_games")
+
+        with open(f"{self.__query_path}/win_streak.sql", "r") as file:
+            sql_query = file.read()
+
+        result_df = self.__spark.sql(sql_query)
         return result_df
