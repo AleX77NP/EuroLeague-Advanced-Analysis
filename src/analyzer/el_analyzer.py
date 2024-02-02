@@ -18,10 +18,10 @@ class ElAnalyzer:
         """
         Calculate the points scored and conceived per team
         Parameters:
-        - order_col: Scolumns used for order by sorting
+        - order_col: Scolumns used for order by sorting (default is 'AVG_PTS_DIFF')
 
         Returns:
-        - result_df: Spark DataFrame with columns 'team', 'AVG_PTS', 'AVG_OP_PTS'
+        - result_df: Spark DataFrame with columns 'team', 'AVG_PTS', 'AVG_OP_PTS' and 'AVG_PTS_DIFF'
         """
         avg_columns = [
             round(avg(col), 1).alias(f"AVG_{col}") for col in ["PTS", "OP_PTS"]
@@ -29,7 +29,7 @@ class ElAnalyzer:
         result_df = (
             self.df.groupBy("team")
             .agg(*avg_columns)
-            .withColumn("AVG_PTS_DIFF", col("AVG_PTS") - col("AVG_OP_PTS"))
+            .withColumn("AVG_PTS_DIFF", round(col("AVG_PTS") - col("AVG_OP_PTS"), 1))
             .orderBy(order_col, ascending=False)
         )
         return result_df
