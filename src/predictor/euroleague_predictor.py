@@ -19,7 +19,7 @@ class EuroLeaguePredictor:
 
         self.__features_columns = features
         self.__label_column = label
-        self.__max_iters = 10
+        self.__max_iters = 20
         self.__reg_param = 0.01
 
         self.__test_data = None
