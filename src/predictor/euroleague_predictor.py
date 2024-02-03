@@ -24,7 +24,6 @@ class EuroLeaguePredictor:
 
         self.__test_data = None
         self.__test_predictions = None
-        self.__model_acc = None
 
     def load_data(self, data):
         # Load your dataset (assuming it has features and labels columns)
@@ -66,8 +65,10 @@ class EuroLeaguePredictor:
             rawPredictionCol="rawPrediction", labelCol=self.__label_column
         )
         accuracy = evaluator.evaluate(predictions)
-        self.__model_acc = accuracy 
-        self.__test_predictions = (predictions.select(self.__label_column).collect(), predictions.select("probability").collect())
+        self.__test_predictions = (
+            predictions.select(self.__label_column).collect(),
+            predictions.select("probability").collect(),
+        )
 
         print(f"Model Accuracy: {accuracy}")
 
@@ -81,9 +82,6 @@ class EuroLeaguePredictor:
 
     def get_model(self):
         return self.__model
-    
-    def get_model_accuracy(self):
-        return self.__model_acc
-    
+
     def get_test_predictions(self):
         return self.__test_predictions
