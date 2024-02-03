@@ -3,7 +3,7 @@ from pyspark.sql.functions import avg, round, col
 
 
 class EuroLeagueAnalyzer:
-    def __init__(self, spark, df):
+    def __init__(self, spark_session, df):
         """
         Initialize the EuroLeagueAnalyzer class with a Spark session and DataFrame.
 
@@ -11,7 +11,7 @@ class EuroLeagueAnalyzer:
         - spark: SparkSession
         - df: intiial DataFrame
         """
-        self.__spark = spark
+        self.__spark = spark_session
         self.__df = df
         self.__query_path = "data/queries"
 
