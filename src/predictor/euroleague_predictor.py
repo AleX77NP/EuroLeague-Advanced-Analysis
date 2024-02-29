@@ -40,7 +40,7 @@ class EuroLeaguePredictor:
 
     def train_model(self):
         # Split the data into training and testing sets
-        train_data, self.__test_data = self.__data.randomSplit([0.8, 0.2], seed=42)
+        train_data = self.__data
 
         # Create a Logistic Regression model
         lr = LogisticRegression(
@@ -56,7 +56,13 @@ class EuroLeaguePredictor:
         # Train the model
         self.__model = pipeline.fit(train_data)
 
-    def evaluate_model(self):
+    def evaluate_model(self, test_df):
+        assembler = VectorAssembler(
+            inputCols=self.__features_columns, outputCol="features"
+        )
+        self.__test_data = assembler.transform(test_df).select(
+            "features", self.__label_column
+        )
         # Make predictions on the test data
         predictions = self.__model.transform(self.__test_data)
 
